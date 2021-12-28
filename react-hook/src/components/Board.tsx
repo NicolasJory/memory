@@ -1,36 +1,75 @@
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Card from './Cards'
-import './Board'
+import '../scss/board.scss'
+import image from '../assets/images';
+
 type BoardProps = {
+    setMoves: React.Dispatch<React.SetStateAction<number>>,
+    finishGameCB: () => void,
     idCards : Array<number>
 }
-const front= [
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SWSH7/SWSH7_FR_49.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM75/SM75_FR_1.png' ,
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM10/SM10_FR_33.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/PL3/PL3_FR_93.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM10/SM10_FR_75.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/DP7/DP7_FR_19.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM9/SM9_FR_15.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM8/SM8_FR_133.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM9/SM9_FR_17.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/XY3/XY3_FR_36.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/DP3/DP3_FR_87.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SWSH4/SWSH4_FR_26.png',
-'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SMP/SMP_FR_SM145.png'
-]
 
 function Board(props: BoardProps) {
     const [returnCards, setReturnCards] = useState<Array<number>>([])
     const [initialCards, setInitialCards] = useState<Array<number>>([])
-   
+    const [disableAllCards, setdisableAllCards] = useState<boolean>(false)
+    const timeout = useRef<NodeJS.Timeout>(setTimeout(() => {}, 0));
+
+    const disable = () => {
+        setdisableAllCards(true)
+    }
+
+    const enable = () => {
+        setdisableAllCards(false)
+    }
+
+    const checkCompletion = () => {
+        if (initialCards.length === props.idCards.length){
+            props.finishGameCB()
+        }
+    }
+
+    const evaluate = () => {
+        const [first, second] = returnCards
+        enable()
+
+        if ((first % 12 + 1) === (second % 12 + 1)) {
+            timeout.current = setTimeout(() => {
+                setInitialCards((prev) => [...prev, first, second])
+                setReturnCards([])
+                return      
+            },100)
+        }
+
+        timeout.current = setTimeout(() => {
+            setReturnCards([])      
+        },500)
+    }
+
     const cardClick = (id:number) => {
         if (returnCards.length === 1) {
-            setReturnCards((last) => [...last, id])
+            setReturnCards((prev) => [...prev, id])
+            props.setMoves((moves) => moves+1)
+            disable()
         } else {
             setReturnCards([id])
         }
     }
+
+    useEffect(() => {
+        let timeout:NodeJS.Timeout = setTimeout(() => {}, 0)
+        if (returnCards.length === 2) {
+            timeout = setTimeout(evaluate, 400)
+        }
+
+        return () => {
+            clearTimeout(timeout)
+        }
+    }, [returnCards])
+
+    useEffect(() => {
+        checkCompletion()  
+    },[initialCards])
 
     const isFlipped = (id: number) => {
         return initialCards.includes(id) || returnCards.includes(id)
@@ -39,6 +78,11 @@ function Board(props: BoardProps) {
     const isInactive = (id: number) => {
         return initialCards.includes(id)
     }
+
+
+
+
+
     return (
         <div className={'board'}>
             {
@@ -46,11 +90,12 @@ function Board(props: BoardProps) {
                     return (
                         <Card 
                             key={i}
-                            image={front[i]}
+                            image={image[i % 12 + 1]}
                             id={i}
+                            onClick={cardClick}
                             isFlipped={isFlipped(i)}
-                            isInactive={isInactive(i)}
-                            onClick={cardClick}/>
+                            isDisable={disableAllCards}
+                            isInactive={isInactive(i)}/>
                         )
                 })
             }

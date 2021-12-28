@@ -1,5 +1,4 @@
-const back= 'https://i.pinimg.com/originals/c5/b1/f3/c5b1f35d29702f1d9cb49f5760029603.png';
-const front= [
+const image= [
 'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SWSH7/SWSH7_FR_49.png',
 'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM75/SM75_FR_1.png' ,
 'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SM10/SM10_FR_33.png',
@@ -13,6 +12,6 @@ const front= [
 'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/DP3/DP3_FR_87.png',
 'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SWSH4/SWSH4_FR_26.png',
 'https://assets.pokemon.com/assets/cms2-fr-fr/img/cards/site_search/SMP/SMP_FR_SM145.png'
-]
+];
 
-export default {back, front};
+export default image;
