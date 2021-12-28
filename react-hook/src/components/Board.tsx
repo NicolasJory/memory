@@ -33,7 +33,7 @@ function Board(props: BoardProps) {
         const [first, second] = returnCards
         enable()
 
-        if ((first % 12 + 1) === (second % 12 + 1)) {
+        if ((first % 6 + 1) === (second % 6 + 1)) {
             timeout.current = setTimeout(() => {
                 setInitialCards((prev) => [...prev, first, second])
                 setReturnCards([])
@@ -90,7 +90,7 @@ function Board(props: BoardProps) {
                     return (
                         <Card 
                             key={i}
-                            image={image[i % 12 + 1]}
+                            image={image[i % 6 + 1]}
                             id={i}
                             onClick={cardClick}
                             isFlipped={isFlipped(i)}
